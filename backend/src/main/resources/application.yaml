@@ -1,3 +1,34 @@
 spring:
   application:
     name: Fleetpulse
+  datasource:
+    url: ${FLEETPULSE_DATABASE_URL:jdbc:postgresql://localhost:5432/fleetpulse}
+    username: ${FLEETPULSE_DATABASE_USERNAME:fleetpulse}
+    password: ${FLEETPULSE_DATABASE_PASSWORD:fleetpulse}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  kafka:
+    bootstrap-servers: ${FLEETPULSE_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  data:
+    redis:
+      host: ${FLEETPULSE_REDIS_HOST:localhost}
+      port: ${FLEETPULSE_REDIS_PORT:6379}
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${FLEETPULSE_JWT_ISSUER_URI:http://localhost:8081/realms/fleetpulse}
+          audiences: ${FLEETPULSE_JWT_AUDIENCE:fleetpulse-api}
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
