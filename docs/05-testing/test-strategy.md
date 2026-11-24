@@ -1,9 +1,11 @@
 # FleetPulse – Test Strategy
 
-**Status:** Proposed strategy  
-**Version:** 1.0
+**Status:** Draft – aligned to BRD/SRS v1.0 and HLD v1.0; test thresholds are acceptance targets, not proven results strategy  
+**Revision:** 1.1
 
 ## 1. Objectives
+
+The BRD/SRS defines initial targets of 99.5% monthly API availability, standard API P95 below 500 ms, and GPS update visibility P95 below five seconds under normal test conditions. Validate these targets in agreed test environments; do not describe them as measured production performance before evidence exists.
 
 Verify functional correctness, tenant isolation, security, reliability, data consistency and acceptable performance across the platform. Tests must validate behavior, not merely code execution.
 
@@ -45,7 +47,7 @@ Verify functional correctness, tenant isolation, security, reliability, data con
 - Reservation expiry/release behavior.
 
 ### Payment
-- Simulated success and failure.
+- Simulated success and failure only; real financial settlement is out of scope for v1.
 - Duplicate payment command is idempotent.
 - Payment timeout/retry does not double-charge (or double-simulate).
 - No card credentials or sensitive payment data are persisted/logged.
@@ -64,7 +66,7 @@ Verify functional correctness, tenant isolation, security, reliability, data con
 
 ## 4. Test data
 
-Use synthetic tenants and users with different roles. Include at least two tenants in automated security tests. Avoid real customer information. Reset ephemeral test data deterministically.
+Use synthetic tenants and users with different roles. Include at least two tenants in automated security tests. The planning range of 1,000–50,000 registered users is not a concurrency target; concurrency and peak request/GPS rates must be agreed before load-test sizing. Avoid real customer information. Reset ephemeral test data deterministically.
 
 ## 5. Automation and gates
 
@@ -73,7 +75,7 @@ CI should run formatting/lint, compile/build, unit tests and fast integration te
 ## 6. Entry/exit criteria
 
 Entry: acceptance criteria and testable contract exist; dependencies/environment available.  
-Exit: all critical tests pass, no unresolved blocker/high-severity defect, test evidence recorded, and known limitations accepted by the owner.
+Exit: all critical tests pass, 100% of tenant-isolation tests pass, no unresolved critical security finding remains for release, no unresolved blocker/high-severity defect remains, test evidence is recorded, and known limitations are accepted by the owner. These release gates reflect the BRD/SRS acceptance criteria.
 
 ## 7. Test reporting
 

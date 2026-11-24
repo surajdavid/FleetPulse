@@ -1,7 +1,7 @@
 # FleetPulse – Coding Standards
 
-**Status:** Proposed baseline  
-**Version:** 1.0
+**Status:** Draft – aligned to BRD/SRS v1.0 and HLD v1.0; pending review baseline  
+**Revision:** 1.1
 
 ## 1. General
 
@@ -14,7 +14,7 @@
 ## 2. Java backend
 
 - Java 21 language/runtime baseline.
-- Use the framework and dependency versions approved in the HLD/build files; do not upgrade dependencies casually.
+- Use Java 21, Spring Boot and the Spring Cloud ecosystem as the proposed source-document baseline; pin actual versions in the build and do not upgrade dependencies casually.
 - Package by business feature/service boundary, not one giant global controller/service/repository package.
 - Use constructor injection; avoid field injection.
 - Keep controllers thin; place use-case logic in application/service layer.
@@ -39,8 +39,10 @@
 
 ## 4. Frontend
 
+- Use React with TypeScript as specified in the HLD.
 - Use reusable components with clear responsibility.
 - Keep API calls in a dedicated client/service layer.
+- Support desktop and mobile-browser layouts; a native mobile application is out of scope for v1.
 - Centralize authentication/session handling and API error mapping.
 - Do not rely on frontend role checks for authorization; backend is authoritative.
 - Handle loading, empty, validation, error and success states.
@@ -51,7 +53,7 @@
 
 - Use versioned migrations; never rely on manual production schema edits.
 - All tenant-owned queries must be tenant-scoped.
-- Use outbox/inbox or equivalent reliable event processing.
+- Use the transactional outbox for critical database changes that must reliably publish Kafka events; add inbox/deduplication handling where needed.
 - Event consumers must be idempotent.
 - Do not share tables across services.
 - Keep event payloads backward-compatible and versioned.

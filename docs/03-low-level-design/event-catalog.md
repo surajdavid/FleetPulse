@@ -1,7 +1,7 @@
 # FleetPulse – Event Catalog
 
-**Status:** Proposed event contract – review required  
-**Version:** 1.0
+**Status:** Draft candidate event catalog – event names/payloads require approval against HLD workflow and service boundaries  
+**Revision:** 1.1
 
 ## 1. Event rules
 
@@ -17,23 +17,24 @@
 
 | Event | Producer | Main consumers | Meaning |
 |---|---|---|---|
-| `TenantCreated` | Identity/Tenant | Reporting, notification | Tenant onboarded |
+| `TenantCreated` | Tenant | Reporting, Notification | Tenant onboarded |
 | `CustomerCreated` | Customer | Order, reporting | Customer profile created |
 | `CustomerUpdated` | Customer | Order, reporting | Customer profile changed |
-| `OrderCreated` | Order/Shipment | Warehouse, Payment, Reporting | Order accepted |
-| `InventoryReservationRequested` | Order/Shipment | Warehouse | Reserve required stock |
-| `InventoryReserved` | Warehouse | Order/Shipment | Stock successfully reserved |
-| `InventoryReservationRejected` | Warehouse | Order/Shipment | Reservation failed |
-| `PaymentRequested` | Order/Shipment | Payment | Payment attempt requested |
-| `PaymentSucceeded` | Payment | Order/Shipment, Reporting, Notification | Simulated/real payment succeeded |
-| `PaymentFailed` | Payment | Order/Shipment, Notification | Payment failed |
-| `ShipmentCreated` | Order/Shipment | Tracking, Reporting, Notification | Shipment record created |
-| `PartnerAssignmentRequested` | Order/Shipment | Allocation | Find eligible partner |
-| `PartnerAssigned` | Allocation | Order/Shipment, Tracking, Notification | Partner assigned |
-| `PartnerAssignmentFailed` | Allocation | Order/Shipment, Notification | No partner assigned |
-| `ShipmentStatusChanged` | Order/Shipment | Notification, Reporting | Shipment state changed |
+| `OrderCreated` | Order | Inventory, Payment, Reporting | Order accepted |
+| `InventoryReservationRequested` | Order | Inventory | Reserve required stock |
+| `InventoryReserved` | Inventory | Order | Stock successfully reserved |
+| `InventoryRejected` | Inventory | Order | Reservation failed |
+| `PaymentRequested` | Order | Payment | Simulated payment attempt requested |
+| `PaymentCompleted` | Payment | Order, Reporting, Notification | Simulated payment completed successfully (real payment processing is out of scope for v1) |
+| `PaymentFailed` | Payment | Order, Notification | Simulated payment failed |
+| `ShipmentCreated` | Order (or approved shipment owner) | Delivery, Tracking, Reporting, Notification | Shipment record created; ownership to be confirmed |
+| `DeliveryAssignmentRequested` | Order / Delivery workflow (owner TBD) | Delivery | Find eligible delivery partner |
+| `DeliveryAssigned` | Delivery | Order, Tracking, Notification | Delivery partner assigned |
+| `DeliveryAssignmentFailed` | Delivery | Order, Notification | No eligible partner assigned |
+| `OrderReadyForDelivery` | Order | Delivery, Notification, Reporting | Order has completed the preceding fulfilment steps and is ready for delivery assignment |
+| `ShipmentStatusChanged` | Order (or approved shipment owner) | Notification, Reporting | Shipment state changed; owner to be confirmed |
 | `LocationUpdated` | Tracking | Reporting / alert rules | New GPS position received |
-| `ShipmentDelivered` | Order/Shipment | Notification, Reporting | Delivery completed |
+| `ShipmentDelivered` | Delivery (or approved shipment owner) | Notification, Reporting | Delivery completed; owner to be confirmed |
 | `NotificationDeliveryFailed` | Notification | Operations/Reporting | Provider delivery failed |
 
 ## 3. Example payload

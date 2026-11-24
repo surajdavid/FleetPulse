@@ -1,9 +1,11 @@
 # FleetPulse – Deployment Strategy
 
-**Status:** Proposed strategy – cloud/provider decision pending  
-**Version:** 1.0
+**Status:** Draft – aligned to BRD/SRS v1.0 and HLD v1.0; pending review AWS-oriented deployment strategy – detailed AWS/Kubernetes topology pending HLD open questions  
+**Revision:** 1.1
 
 ## 1. Release principles
+
+The source documents specify AWS as the cloud direction, Docker containers, Kubernetes as the deployment target and GitHub Actions for CI/CD. Exact AWS service mapping and cluster topology remain open; this document does not select specific AWS compute/database/messaging products.
 
 - Build once and promote the same immutable artifact through environments.
 - Use versioned container images and database migrations.
@@ -23,6 +25,8 @@
 Promotion requires successful tests, vulnerability/dependency checks, migration review and release notes.
 
 ## 3. Deployment approach
+
+Use Docker images and the approved Kubernetes deployment target when the environment is established. Keep the local developer environment lightweight (Docker Compose is a local-development option, not a production topology decision).
 
 For stateless services, use rolling deployment with readiness checks. Use blue/green or canary for higher-risk changes when the chosen platform supports it. Database migrations must follow expand-and-contract:
 1. Add backward-compatible schema.

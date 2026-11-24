@@ -1,72 +1,63 @@
-# FleetPulse – Monitoring Strategy
+# FleetPulse – Deployment Strategy
 
-**Status:** Proposed operational baseline  
-**Version:** 1.0
+**Status:** Draft – aligned to BRD/SRS v1.0 and HLD v1.0; pending review AWS-oriented deployment strategy – detailed AWS/Kubernetes topology pending HLD open questions  
+**Revision:** 1.1
 
-## 1. Objectives
+## 1. Release principles
 
-Detect user-impacting failures, explain cross-service workflows, protect tenant data and understand capacity before incidents occur.
+The source documents specify AWS as the cloud direction, Docker containers, Kubernetes as the deployment target and GitHub Actions for CI/CD. Exact AWS service mapping and cluster topology remain open; this document does not select specific AWS compute/database/messaging products.
 
-## 2. Three pillars
+- Build once and promote the same immutable artifact through environments.
+- Use versioned container images and database migrations.
+- Keep configuration external to images.
+- Deploy backward-compatible changes before removing old contracts.
+- Use health/readiness checks and automated rollback or forward-fix procedures.
+- Never deploy unreviewed code directly to production.
 
-### Logs
-- Centralize structured application logs.
-- Include timestamp, severity, service, environment, correlation ID and trace ID.
-- Include tenant ID only where operationally necessary and safe; do not log sensitive payloads.
-- Redact credentials, tokens, personal details and payment data.
-- Define retention and access controls.
+## 2. Environments and promotion
 
-### Metrics
-Recommended service metrics:
-- Request count, error rate and latency percentiles.
-- JVM heap, GC, thread pool and process health.
-- Database connection pool, query latency and connection errors.
-- Broker consumer lag, publish failures, retry and dead-letter counts.
-- Order/shipment counts by state.
-- Inventory reservation failures and conflicts.
-- Payment simulator success/failure counts.
-- GPS ingestion rate and rejected update count.
-- Notification delivery success/failure and queue age.
+1. Local developer environment.
+2. CI ephemeral environment for automated tests.
+3. Development environment for integration.
+4. Staging for release candidate verification.
+5. Production after approval.
 
-Avoid high-cardinality labels such as raw customer IDs, shipment IDs or unrestricted tenant IDs.
+Promotion requires successful tests, vulnerability/dependency checks, migration review and release notes.
 
-### Traces
-Use distributed tracing with trace/correlation propagation across gateway, REST calls and message headers. Trace sampling must balance troubleshooting value, cost and privacy.
+## 3. Deployment approach
 
-## 3. Health endpoints
+Use Docker images and the approved Kubernetes deployment target when the environment is established. Keep the local developer environment lightweight (Docker Compose is a local-development option, not a production topology decision).
 
-- Liveness: process is running and should not be restarted.
-- Readiness: service can accept traffic; check only dependencies essential to safe operation.
-- Startup probe where slow initialization requires it.
-  Do not expose internal dependency details publicly.
+For stateless services, use rolling deployment with readiness checks. Use blue/green or canary for higher-risk changes when the chosen platform supports it. Database migrations must follow expand-and-contract:
+1. Add backward-compatible schema.
+2. Deploy code compatible with old and new schema.
+3. Backfill if required.
+4. Switch reads/writes.
+5. Remove obsolete schema in a later release.
 
-## 4. Alerting
+## 4. Configuration and secrets
 
-Create actionable alerts for:
-- Sustained elevated 5xx rate or latency.
-- Service unavailable / readiness failures.
-- Database connection exhaustion or storage pressure.
-- Broker outage, consumer lag or dead-letter growth.
-- Repeated payment/assignment workflow failures.
-- Notification backlog or provider failure spike.
-- Backup failure and certificate/secret expiry.
+- Separate configuration per environment.
+- Store credentials in a managed secrets store.
+- Use workload identity/short-lived credentials where possible.
+- Rotate secrets and document emergency revocation.
+- Do not expose secrets in CI logs or container images.
 
-Every alert should have severity, owner, runbook link and clear threshold rationale. Avoid alerting on a single transient failure.
+## 5. Rollback and recovery
 
-## 5. Operational dashboards
+- Keep prior known-good image versions.
+- Define service-specific rollback instructions.
+- Do not assume database rollback is safe; prefer forward-fix for destructive migrations.
+- Verify data integrity and event replay implications after rollback.
+- Maintain backup restore procedures and test them periodically.
 
-1. Platform overview: availability, request rate, errors, latency.
-2. Service health: JVM, DB pools, dependencies.
-3. Logistics operations: orders and shipments by state, allocation and delivery outcomes.
-4. Event pipeline: throughput, lag, retries, DLQ.
-5. Tenant support: carefully permissioned tenant-level operational view.
+## 6. Release checklist
 
-## 6. SLOs and incident response
-
-Define service-level indicators and objectives only after baseline traffic and business expectations are known. Candidate SLIs: successful API request ratio, p95 latency, event processing delay, and notification delivery delay.
-
-Incident process: detect → acknowledge → assess impact → mitigate → communicate → recover → post-incident review. Record timeline, root cause, contributing factors, corrective actions and owners.
-
-## 7. Privacy and access
-
-Restrict observability access by role. Apply retention/deletion policy. Ensure dashboards and traces cannot be used to browse tenant data without authorization.
+- [ ] PRs reviewed and merged; CI green.
+- [ ] Release notes and artifact versions recorded.
+- [ ] Configuration and secrets verified.
+- [ ] Migrations reviewed and backup completed.
+- [ ] Health/readiness and smoke tests pass.
+- [ ] Dashboards and alerts active.
+- [ ] Rollback/forward-fix owner and procedure known.
+- [ ] Product owner approves release.

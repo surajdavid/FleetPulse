@@ -1,7 +1,7 @@
 # FleetPulse – CI/CD Design
 
-**Status:** Proposed pipeline – align with actual repository and CI provider  
-**Version:** 1.0
+**Status:** Draft – aligned to BRD/SRS v1.0 and HLD v1.0; pending review GitHub Actions pipeline – align workflow files with the actual repository configuration  
+**Revision:** 1.1
 
 ## 1. Pipeline goals
 
@@ -40,8 +40,8 @@ flowchart TD
 
 ## 4. Required checks
 
-- Backend: Java 21 toolchain, Maven wrapper, compile, unit tests, integration tests as appropriate.
-- Frontend: pinned Node version, install from lockfile, lint, format check and production build.
+- Backend: Java 21 toolchain, Maven wrapper, Spring Boot build, compile, unit tests and integration tests as appropriate.
+- Frontend: React + TypeScript; pinned Node version, install from lockfile, lint, format check and production build.
 - Static analysis and dependency vulnerability scan.
 - Secret scanning.
 - Container image scan when images are introduced.
@@ -62,4 +62,4 @@ Use Maven and package-manager caches without weakening dependency integrity. Com
 
 ## 7. Pipeline ownership
 
-Backend/frontend owners maintain build steps; DevOps owns deployment and environment controls; architecture/security owners approve high-impact pipeline permission changes.
+With the BRD/SRS assumption of two primary developers, backend and frontend pipeline maintenance is shared by the developers. Deployment, environment, security and release controls are also shared unless dedicated ownership is assigned. GitHub Actions is the source-document CI/CD baseline.
